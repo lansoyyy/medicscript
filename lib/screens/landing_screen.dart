@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:mediscript/screens/result_screen.dart';
 import 'package:mediscript/utils/colors.dart';
 import 'package:mediscript/widgets/text_widget.dart';
@@ -14,6 +15,12 @@ class LandingScreen extends StatefulWidget {
 
 class _LandingScreenState extends State<LandingScreen> {
   var hasLoaded = false;
+
+  bool textScanning = false;
+
+  XFile? imageFile1;
+
+  String scannedText = "";
 
   // firebase_storage.FirebaseStorage storage =
   //     firebase_storage.FirebaseStorage.instance;
@@ -88,6 +95,56 @@ class _LandingScreenState extends State<LandingScreen> {
     }
   }
 
+  void getImage(ImageSource source) async {
+    try {
+      final pickedImage = await ImagePicker().pickImage(source: source);
+      if (pickedImage != null) {
+        textScanning = true;
+        imageFile1 = pickedImage;
+        setState(() {});
+        getRecognisedText(pickedImage);
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const ResultScreen()));
+      }
+    } catch (e) {
+      textScanning = false;
+      imageFile1 = null;
+      scannedText = "Error occured while scanning";
+
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) => Padding(
+          padding: const EdgeInsets.only(left: 30, right: 30),
+          child: AlertDialog(
+              title: Text(e.toString(),
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'QRegular'))),
+        ),
+      );
+      setState(() {});
+    }
+  }
+
+  void getRecognisedText(XFile image) async {
+    final inputImage = InputImage.fromFilePath(image.path);
+    final textDetector = GoogleMlKit.vision.textDetector();
+    RecognisedText recognisedText = await textDetector.processImage(inputImage);
+    await textDetector.close();
+    scannedText = "";
+    for (TextBlock block in recognisedText.blocks) {
+      for (TextLine line in block.lines) {
+        scannedText = "$scannedText${line.text}\n";
+      }
+    }
+    textScanning = false;
+    setState(() {});
+
+    print('${scannedText}result');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,7 +168,7 @@ class _LandingScreenState extends State<LandingScreen> {
               children: [
                 GestureDetector(
                   onTap: (() {
-                    uploadPicture('camera');
+                    getImage(ImageSource.camera);
                   }),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -129,7 +186,7 @@ class _LandingScreenState extends State<LandingScreen> {
                 ),
                 GestureDetector(
                   onTap: (() {
-                    uploadPicture('gallery');
+                    getImage(ImageSource.gallery);
                   }),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

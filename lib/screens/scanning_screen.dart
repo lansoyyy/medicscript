@@ -48,8 +48,6 @@ class _ScanningScreenState extends State<ScanningScreen> {
                         padding: const EdgeInsets.only(top: 10),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.grey,
-                            backgroundColor: Colors.white,
                             shadowColor: Colors.grey[400],
                             elevation: 10,
                             shape: RoundedRectangleBorder(
@@ -82,8 +80,6 @@ class _ScanningScreenState extends State<ScanningScreen> {
                         padding: const EdgeInsets.only(top: 10),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.grey,
-                            backgroundColor: Colors.white,
                             shadowColor: Colors.grey[400],
                             elevation: 10,
                             shape: RoundedRectangleBorder(
@@ -158,6 +154,8 @@ class _ScanningScreenState extends State<ScanningScreen> {
     }
     textScanning = false;
     setState(() {});
+
+    print('${scannedText}result');
   }
 
   @override
