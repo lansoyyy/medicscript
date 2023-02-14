@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:flutter/material.dart';
 import 'package:mediscript/screens/landing_screen.dart';
+import 'package:mediscript/screens/scanning_screen.dart';
 import 'package:mediscript/widgets/text_widget.dart';
 
 import '../utils/colors.dart';
@@ -19,7 +20,7 @@ class _ScreenState extends State<SplashScreen> {
     super.initState();
     Timer(const Duration(seconds: 6), () async {
       Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => LandingScreen()));
+          MaterialPageRoute(builder: (context) => const ScanningScreen()));
     });
   }
 
