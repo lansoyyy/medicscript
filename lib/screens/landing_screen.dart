@@ -81,8 +81,8 @@ class _LandingScreenState extends State<LandingScreen> {
         hasLoaded = true;
       });
 
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const ResultScreen()));
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const ResultScreen()));
       // } on firebase_storage.FirebaseException catch (error) {
       //   if (kDebugMode) {
       //     print(error);
