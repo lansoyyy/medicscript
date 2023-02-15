@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:mediscript/screens/result_screen.dart';
@@ -6,7 +5,6 @@ import 'package:mediscript/utils/colors.dart';
 import 'package:mediscript/widgets/text_widget.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as path;
 
 class LandingScreen extends StatefulWidget {
   @override
@@ -31,80 +29,107 @@ class _LandingScreenState extends State<LandingScreen> {
 
   late String imageURL = '';
 
-  Future<void> uploadPicture(String inputSource) async {
-    final picker = ImagePicker();
-    XFile pickedImage;
+  // Future<void> uploadPicture(String inputSource) async {
+  //   final picker = ImagePicker();
+  //   XFile pickedImage;
 
-    pickedImage = (await picker.pickImage(
-        source:
-            inputSource == 'camera' ? ImageSource.camera : ImageSource.gallery,
-        maxWidth: 1920))!;
+  //   pickedImage = (await picker.pickImage(
+  //       source:
+  //           inputSource == 'camera' ? ImageSource.camera : ImageSource.gallery,
+  //       maxWidth: 1920))!;
 
-    fileName = path.basename(pickedImage.path);
-    imageFile = File(pickedImage.path);
+  //   fileName = path.basename(pickedImage.path);
+  //   imageFile = File(pickedImage.path);
 
-    try {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => Padding(
-          padding: const EdgeInsets.only(left: 30, right: 30),
-          child: AlertDialog(
-              title: Row(
-            children: const [
-              CircularProgressIndicator(
-                color: Colors.black,
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              Text(
-                'Loading . . .',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'QRegular'),
-              ),
-            ],
-          )),
-        ),
-      );
+  //   try {
+  //     showDialog(
+  //       context: context,
+  //       barrierDismissible: false,
+  //       builder: (BuildContext context) => Padding(
+  //         padding: const EdgeInsets.only(left: 30, right: 30),
+  //         child: AlertDialog(
+  //             title: Row(
+  //           children: const [
+  //             CircularProgressIndicator(
+  //               color: Colors.black,
+  //             ),
+  //             SizedBox(
+  //               width: 20,
+  //             ),
+  //             Text(
+  //               'Loading . . .',
+  //               style: TextStyle(
+  //                   color: Colors.black,
+  //                   fontWeight: FontWeight.bold,
+  //                   fontFamily: 'QRegular'),
+  //             ),
+  //           ],
+  //         )),
+  //       ),
+  //     );
 
-      // await firebase_storage.FirebaseStorage.instance
-      //     .ref('CoverPhoto/$fileName')
-      //     .putFile(imageFile);
-      // imageURL = await firebase_storage.FirebaseStorage.instance
-      //     .ref('CoverPhoto/$fileName')
-      //     .getDownloadURL();
+  //     // await firebase_storage.FirebaseStorage.instance
+  //     //     .ref('CoverPhoto/$fileName')
+  //     //     .putFile(imageFile);
+  //     // imageURL = await firebase_storage.FirebaseStorage.instance
+  //     //     .ref('CoverPhoto/$fileName')
+  //     //     .getDownloadURL();
 
-      setState(() {
-        hasLoaded = true;
-      });
+  //     setState(() {
+  //       hasLoaded = true;
+  //     });
 
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => const ResultScreen()));
-      // } on firebase_storage.FirebaseException catch (error) {
-      //   if (kDebugMode) {
-      //     print(error);
-      //   }
-      // }
-    } catch (err) {
-      if (kDebugMode) {
-        print(err);
-      }
-    }
-  }
+  //     Navigator.of(context)
+  //         .push(MaterialPageRoute(builder: (context) => ResultScreen()));
+  //     // } on firebase_storage.FirebaseException catch (error) {
+  //     //   if (kDebugMode) {
+  //     //     print(error);
+  //     //   }
+  //     // }
+  //   } catch (err) {
+  //     if (kDebugMode) {
+  //       print(err);
+  //     }
+  //   }
+  // }
 
   void getImage(ImageSource source) async {
+    List<String> meds = [];
     try {
       final pickedImage = await ImagePicker().pickImage(source: source);
       if (pickedImage != null) {
         textScanning = true;
         imageFile1 = pickedImage;
-        setState(() {});
-        getRecognisedText(pickedImage);
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const ResultScreen()));
+
+        final inputImage = InputImage.fromFilePath(pickedImage.path);
+        final textDetector = GoogleMlKit.vision.textDetector();
+        RecognisedText recognisedText =
+            await textDetector.processImage(inputImage);
+
+        await textDetector.close();
+        scannedText = "";
+        for (TextBlock block in recognisedText.blocks) {
+          for (TextLine line in block.lines) {
+            scannedText = "$scannedText${line.text}\n";
+
+            meds.add(scannedText);
+
+            // if (line.text.toLowerCase().contains('metformin')) {
+            //   print('yes');
+            //   scanned.add('metro');
+            // } else {
+            //   print('no');
+            // }
+          }
+        }
+        textScanning = false;
+
+        await Future.delayed(const Duration(seconds: 2));
+
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => ResultScreen(
+                  meds: meds,
+                )));
       }
     } catch (e) {
       textScanning = false;
@@ -124,25 +149,7 @@ class _LandingScreenState extends State<LandingScreen> {
                       fontFamily: 'QRegular'))),
         ),
       );
-      setState(() {});
     }
-  }
-
-  void getRecognisedText(XFile image) async {
-    final inputImage = InputImage.fromFilePath(image.path);
-    final textDetector = GoogleMlKit.vision.textDetector();
-    RecognisedText recognisedText = await textDetector.processImage(inputImage);
-    await textDetector.close();
-    scannedText = "";
-    for (TextBlock block in recognisedText.blocks) {
-      for (TextLine line in block.lines) {
-        scannedText = "$scannedText${line.text}\n";
-      }
-    }
-    textScanning = false;
-    setState(() {});
-
-    print('${scannedText}result');
   }
 
   @override

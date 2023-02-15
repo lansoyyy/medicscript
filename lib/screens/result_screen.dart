@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:mediscript/screens/med_screen.dart';
 import 'package:mediscript/utils/colors.dart';
 import 'package:mediscript/widgets/text_widget.dart';
 
 class ResultScreen extends StatelessWidget {
-  const ResultScreen({super.key});
+  List<String> meds = [];
 
+  ResultScreen({required this.meds});
   @override
   Widget build(BuildContext context) {
+    final box = GetStorage();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -24,6 +27,7 @@ class ResultScreen extends StatelessWidget {
         ],
       ),
       body: GridView.builder(
+          itemCount: meds.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2),
           itemBuilder: ((context, index) {
