@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:mediscript/screens/med_screen.dart';
 import 'package:mediscript/utils/colors.dart';
 import 'package:mediscript/widgets/text_widget.dart';
 import 'package:http/http.dart' as http;
+import 'package:mediscript/widgets/webview.dart';
 
 class ResultScreen extends StatelessWidget {
   Future<bool> linkExists(String url) async {
@@ -52,7 +52,9 @@ class ResultScreen extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const MedScreen()));
+                            builder: (context) => WebviewWidget(
+                                link:
+                                    'https://www.drugs.com/${meds[index].toLowerCase()}.html')));
                       },
                       child: Card(
                         elevation: 3,
@@ -74,12 +76,8 @@ class ResultScreen extends StatelessWidget {
                                     const BoxDecoration(color: Colors.black54),
                                 child: ListTile(
                                   title: TextBold(
-                                      text: 'Medicine Name',
-                                      fontSize: 12,
-                                      color: Colors.white),
-                                  trailing: TextRegular(
-                                      text: '1/30/2023',
-                                      fontSize: 12,
+                                      text: meds[index],
+                                      fontSize: 15,
                                       color: Colors.white),
                                 ),
                               ),
