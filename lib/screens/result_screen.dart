@@ -3,8 +3,21 @@ import 'package:get_storage/get_storage.dart';
 import 'package:mediscript/screens/med_screen.dart';
 import 'package:mediscript/utils/colors.dart';
 import 'package:mediscript/widgets/text_widget.dart';
+import 'package:http/http.dart' as http;
 
 class ResultScreen extends StatelessWidget {
+  Future<bool> linkExists(String url) async {
+    final thisUrl = url;
+
+    final response = await http.head(Uri.parse(thisUrl));
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   List<String> meds = [];
 
   ResultScreen({required this.meds});
@@ -31,48 +44,52 @@ class ResultScreen extends StatelessWidget {
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2),
           itemBuilder: ((context, index) {
-            return Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const MedScreen()));
-                },
-                child: Card(
-                  elevation: 3,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                        color: Colors.white,
-                        image: DecorationImage(
-                            image: AssetImage('assets/images/logo.jpg'),
-                            fit: BoxFit.cover)),
-                    height: 1000,
-                    width: 200,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: 50,
-                          decoration:
-                              const BoxDecoration(color: Colors.black54),
-                          child: ListTile(
-                            title: TextBold(
-                                text: 'Medicine Name',
-                                fontSize: 12,
-                                color: Colors.white),
-                            trailing: TextRegular(
-                                text: '1/30/2023',
-                                fontSize: 12,
-                                color: Colors.white),
+            return linkExists(
+                        'https://www.drugs.com/${meds[index].toLowerCase()}.html') ==
+                    true
+                ? Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const MedScreen()));
+                      },
+                      child: Card(
+                        elevation: 3,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              image: DecorationImage(
+                                  image: AssetImage('assets/images/logo.jpg'),
+                                  fit: BoxFit.cover)),
+                          height: 1000,
+                          width: 200,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 50,
+                                decoration:
+                                    const BoxDecoration(color: Colors.black54),
+                                child: ListTile(
+                                  title: TextBold(
+                                      text: 'Medicine Name',
+                                      fontSize: 12,
+                                      color: Colors.white),
+                                  trailing: TextRegular(
+                                      text: '1/30/2023',
+                                      fontSize: 12,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            );
+                  )
+                : const SizedBox();
           })),
     );
   }
