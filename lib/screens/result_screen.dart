@@ -3,7 +3,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:mediscript/utils/colors.dart';
 import 'package:mediscript/widgets/text_widget.dart';
 import 'package:http/http.dart' as http;
-import 'package:mediscript/widgets/webview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ResultScreen extends StatelessWidget {
   Future<bool> linkExists(String url) async {
@@ -59,11 +59,14 @@ class ResultScreen extends StatelessWidget {
                         ? Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => WebviewWidget(
-                                        link:
-                                            'https://www.drugs.com/${meds[index].toLowerCase().trim()}.html')));
+                              onTap: () async {
+                                if (await canLaunch(
+                                    'https://www.drugs.com/${meds[index].toLowerCase().trim()}.html')) {
+                                  await launch(
+                                      'https://www.drugs.com/${meds[index].toLowerCase().trim()}.html');
+                                } else {
+                                  throw 'Could not launch https://www.drugs.com/${meds[index].toLowerCase().trim()}.html';
+                                }
                               },
                               child: Card(
                                 elevation: 3,

@@ -40,7 +40,7 @@ dependencies:
   flutter_spinkit:
   google_ml_kit: ^0.7.3
   get_storage:
-  webview_flutter:
+  url_launcher:
 
 
 dev_dependencies:
