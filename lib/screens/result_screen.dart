@@ -9,7 +9,8 @@ class ResultScreen extends StatelessWidget {
   Future<bool> linkExists(String url) async {
     final thisUrl = url;
 
-    final response = await http.head(Uri.parse(thisUrl));
+    final response =
+        await http.head(Uri.parse('https://www.drugs.com/${url.trim()}.html'));
 
     if (response.statusCode == 200) {
       return true;
@@ -44,50 +45,61 @@ class ResultScreen extends StatelessWidget {
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2),
           itemBuilder: ((context, index) {
-            return linkExists(
-                        'https://www.drugs.com/${meds[index].toLowerCase()}.html') ==
-                    true
-                ? Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => WebviewWidget(
-                                link:
-                                    'https://www.drugs.com/${meds[index].toLowerCase()}.html')));
-                      },
-                      child: Card(
-                        elevation: 3,
-                        child: Container(
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              image: DecorationImage(
-                                  image: AssetImage('assets/images/logo.jpg'),
-                                  fit: BoxFit.cover)),
-                          height: 1000,
-                          width: 200,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                height: 50,
-                                decoration:
-                                    const BoxDecoration(color: Colors.black54),
-                                child: ListTile(
-                                  title: TextBold(
-                                      text: meds[index],
-                                      fontSize: 15,
-                                      color: Colors.white),
+            return FutureBuilder<bool>(
+                future: linkExists(meds[index].toLowerCase()),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox(); // Show empty space while waiting for the future
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    bool exists = snapshot.data!;
+
+                    return exists == true
+                        ? Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => WebviewWidget(
+                                        link:
+                                            'https://www.drugs.com/${meds[index].toLowerCase().trim()}.html')));
+                              },
+                              child: Card(
+                                elevation: 3,
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      image: DecorationImage(
+                                          image: AssetImage(
+                                              'assets/images/logo.jpg'),
+                                          fit: BoxFit.cover)),
+                                  height: 1000,
+                                  width: 200,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        width: double.infinity,
+                                        height: 50,
+                                        decoration: const BoxDecoration(
+                                            color: Colors.black54),
+                                        child: ListTile(
+                                          title: TextBold(
+                                              text: meds[index],
+                                              fontSize: 15,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                : const SizedBox();
+                            ),
+                          )
+                        : const SizedBox();
+                  }
+                });
           })),
     );
   }
