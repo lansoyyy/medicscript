@@ -218,8 +218,8 @@ class _LandingScreenState extends State<LandingScreen> {
             GestureDetector(
               onTap: (() {
                 // getImage(ImageSource.gallery);
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const HistoryScreen()));
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => HistoryScreen()));
               }),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
