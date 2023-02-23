@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:mediscript/screens/history_screen.dart';
 import 'package:mediscript/screens/result_screen.dart';
 import 'package:mediscript/utils/colors.dart';
 import 'package:mediscript/widgets/text_widget.dart';
@@ -210,6 +211,28 @@ class _LandingScreenState extends State<LandingScreen> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            GestureDetector(
+              onTap: (() {
+                // getImage(ImageSource.gallery);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const HistoryScreen()));
+              }),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.history,
+                    size: 54,
+                    color: Colors.white,
+                  ),
+                  TextBold(text: 'History', fontSize: 18, color: Colors.white),
+                ],
+              ),
             ),
           ],
         ),
