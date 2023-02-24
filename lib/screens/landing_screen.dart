@@ -135,20 +135,24 @@ class _LandingScreenState extends State<LandingScreen> {
 
         await textDetector.close();
         scannedText = "";
+
         for (TextBlock block in recognisedText.blocks) {
           for (TextLine line in block.lines) {
-            scannedText = "$scannedText${line.text}\n";
-
-            meds.add(scannedText);
-
-            // if (line.text.toLowerCase().contains('metformin')) {
-            //   print('yes');
-            //   scanned.add('metro');
-            // } else {
-            //   print('no');
-            // }
+            List<String> words = line.text.split(' ');
+            for (String word in words) {
+              meds.add(word);
+            }
           }
         }
+        // for (TextBlock block in recognisedText.blocks) {
+        //   for (TextLine line in block.lines) {
+        //     setState(() {
+        //       scannedText = "$scannedText${line.text}";
+        //     });
+        //   }
+        // }
+
+        print(meds);
         textScanning = false;
 
         await Future.delayed(const Duration(seconds: 2));

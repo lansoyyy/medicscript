@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:localstore/localstore.dart';
 import 'package:mediscript/utils/colors.dart';
 import 'package:mediscript/widgets/text_widget.dart';
@@ -17,8 +16,6 @@ class ResultScreen extends StatefulWidget {
 
 class _ResultScreenState extends State<ResultScreen> {
   Future<bool> linkExists(String url) async {
-    final thisUrl = url;
-
     final response =
         await http.head(Uri.parse('https://www.drugs.com/${url.trim()}.html'));
 
@@ -33,7 +30,6 @@ class _ResultScreenState extends State<ResultScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final box = GetStorage();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -60,12 +56,15 @@ class _ResultScreenState extends State<ResultScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const SizedBox(); // Show empty space while waiting for the future
                   } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
+                    return const Center(child: CircularProgressIndicator());
                   } else {
                     bool exists = snapshot.data!;
 
                     if (exists == true) {
+                      print('called');
                       final id = db.collection('History').doc().id;
+
+                      print(widget.meds[index]);
                       db.collection('Categ').doc(id).set({
                         'name': widget.meds[index],
                         'link':
