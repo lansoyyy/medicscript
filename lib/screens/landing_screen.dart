@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:mediscript/screens/history_screen.dart';
 import 'package:mediscript/screens/result_screen.dart';
 import 'package:mediscript/utils/colors.dart';
@@ -102,7 +103,32 @@ class _LandingScreenState extends State<LandingScreen> {
         textScanning = true;
         imageFile1 = pickedImage;
 
-        final inputImage = InputImage.fromFilePath(pickedImage.path);
+        CroppedFile? croppedFile = await ImageCropper().cropImage(
+          sourcePath: imageFile1!.path,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9
+          ],
+          uiSettings: [
+            AndroidUiSettings(
+                toolbarTitle: 'Cropper',
+                toolbarColor: Colors.deepOrange,
+                toolbarWidgetColor: Colors.white,
+                initAspectRatio: CropAspectRatioPreset.original,
+                lockAspectRatio: false),
+            IOSUiSettings(
+              title: 'Cropper',
+            ),
+            WebUiSettings(
+              context: context,
+            ),
+          ],
+        );
+
+        final inputImage = InputImage.fromFilePath(croppedFile!.path);
         final textDetector = GoogleMlKit.vision.textDetector();
         RecognisedText recognisedText =
             await textDetector.processImage(inputImage);
