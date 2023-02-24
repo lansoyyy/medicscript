@@ -16,13 +16,18 @@ class ResultScreen extends StatefulWidget {
 
 class _ResultScreenState extends State<ResultScreen> {
   Future<bool> linkExists(String url) async {
-    final response =
-        await http.head(Uri.parse('https://www.drugs.com/${url.trim()}.html'));
-
-    if (response.statusCode == 200) {
-      return true;
-    } else {
+    bool containsNumbers = RegExp(r'\d').hasMatch(url);
+    if (containsNumbers) {
       return false;
+    } else {
+      final response = await http
+          .head(Uri.parse('https://www.drugs.com/${url.trim()}.html'));
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
@@ -61,11 +66,9 @@ class _ResultScreenState extends State<ResultScreen> {
                     bool exists = snapshot.data!;
 
                     if (exists == true) {
-                      print('called');
                       final id = db.collection('History').doc().id;
 
-                      print(widget.meds[index]);
-                      db.collection('Categ').doc(id).set({
+                      db.collection('History').doc(id).set({
                         'name': widget.meds[index],
                         'link':
                             'https://www.drugs.com/${widget.meds[index].toLowerCase().trim()}.html'
