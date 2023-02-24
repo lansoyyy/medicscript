@@ -1,105 +1,112 @@
 import 'package:flutter/material.dart';
+import 'package:localstore/localstore.dart';
 import 'package:mediscript/widgets/text_widget.dart';
-import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import '../utils/colors.dart';
 
-class HistoryScreen extends StatelessWidget {
-  Future<bool> linkExists(String url) async {
-    final thisUrl = url;
+class HistoryScreen extends StatefulWidget {
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
 
-    final response =
-        await http.head(Uri.parse('https://www.drugs.com/${url.trim()}.html'));
+class _HistoryScreenState extends State<HistoryScreen> {
+  final db = Localstore.instance;
 
-    if (response.statusCode == 200) {
-      return true;
-    } else {
-      return false;
-    }
+  @override
+  void initState() {
+    super.initState();
+    getData();
   }
 
-  List<String> meds = [];
+  var hasLoaded = false;
+
+  List<String> names = [];
+  List<String> links = [];
+
+  getData() async {
+    final items = await db.collection('History').get();
+
+    if (items != null) {
+      items.forEach((key, value) {
+        names.add(value['name']);
+        links.add(value['link']);
+      });
+    }
+
+    setState(() {
+      hasLoaded = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: primary,
-          title:
-              TextBold(text: 'Name of Med', fontSize: 18, color: Colors.white),
-          centerTitle: true,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 7.5, 20, 7.5),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset('assets/images/logo.jpg')),
-            )
-          ],
-        ),
-        body: GridView.builder(
-            itemCount: meds.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2),
-            itemBuilder: ((context, index) {
-              return FutureBuilder<bool>(
-                  future: linkExists(meds[index].toLowerCase()),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SizedBox(); // Show empty space while waiting for the future
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      bool exists = snapshot.data!;
-
-                      return exists == true
-                          ? Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: GestureDetector(
-                                onTap: () async {
-                                  if (await canLaunch(
-                                      'https://www.drugs.com/${meds[index].toLowerCase().trim()}.html')) {
-                                    await launch(
-                                        'https://www.drugs.com/${meds[index].toLowerCase().trim()}.html');
-                                  } else {
-                                    throw 'Could not launch https://www.drugs.com/${meds[index].toLowerCase().trim()}.html';
-                                  }
-                                },
-                                child: Card(
-                                  elevation: 3,
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        image: DecorationImage(
-                                            image: AssetImage(
-                                                'assets/images/logo.jpg'),
-                                            fit: BoxFit.cover)),
-                                    height: 1000,
-                                    width: 200,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          width: double.infinity,
-                                          height: 50,
-                                          decoration: const BoxDecoration(
-                                              color: Colors.black54),
-                                          child: ListTile(
-                                            title: TextBold(
-                                                text: meds[index],
-                                                fontSize: 15,
-                                                color: Colors.white),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+    return hasLoaded
+        ? Scaffold(
+            appBar: AppBar(
+              backgroundColor: primary,
+              title:
+                  TextBold(text: 'History', fontSize: 18, color: Colors.white),
+              centerTitle: true,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 7.5, 20, 7.5),
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.asset('assets/images/logo.jpg')),
+                )
+              ],
+            ),
+            body: GridView.builder(
+                itemCount: names.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
+                itemBuilder: ((context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: GestureDetector(
+                      onTap: () async {
+                        if (await canLaunch(links[index])) {
+                          await launch(links[index]);
+                        } else {
+                          throw 'Could not launch ${links[index]}';
+                        }
+                      },
+                      child: Card(
+                        elevation: 3,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              image: DecorationImage(
+                                  image: AssetImage('assets/images/logo.jpg'),
+                                  fit: BoxFit.cover)),
+                          height: 1000,
+                          width: 200,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 50,
+                                decoration:
+                                    const BoxDecoration(color: Colors.black54),
+                                child: ListTile(
+                                  title: TextBold(
+                                      text: names[index],
+                                      fontSize: 15,
+                                      color: Colors.white),
                                 ),
                               ),
-                            )
-                          : const SizedBox();
-                    }
-                  });
-            })));
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                })))
+        : const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
   }
 }
