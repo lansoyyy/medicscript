@@ -43,6 +43,7 @@ dependencies:
   url_launcher:
   image_cropper:
   localstore:
+  speech_to_text:
 
 
 dev_dependencies:
