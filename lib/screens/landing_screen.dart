@@ -9,6 +9,8 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class LandingScreen extends StatefulWidget {
+  const LandingScreen({super.key});
+
   @override
   State<LandingScreen> createState() => _LandingScreenState();
 }
@@ -243,26 +245,54 @@ class _LandingScreenState extends State<LandingScreen> {
               ],
             ),
             const SizedBox(
-              height: 20,
+              height: 30,
             ),
-            GestureDetector(
-              onTap: (() {
-                // getImage(ImageSource.gallery);
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => HistoryScreen()));
-              }),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.history,
-                    size: 54,
-                    color: Colors.white,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: (() {
+                    // getImage(ImageSource.gallery);
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => HistoryScreen()));
+                  }),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.history,
+                        size: 54,
+                        color: Colors.white,
+                      ),
+                      TextBold(
+                          text: 'History', fontSize: 18, color: Colors.white),
+                    ],
                   ),
-                  TextBold(text: 'History', fontSize: 18, color: Colors.white),
-                ],
-              ),
+                ),
+                GestureDetector(
+                  onTap: (() {
+                    // getImage(ImageSource.gallery);
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => HistoryScreen()));
+                  }),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.voice_chat,
+                        size: 54,
+                        color: Colors.white,
+                      ),
+                      TextBold(
+                          text: 'Speech to Text',
+                          fontSize: 12,
+                          color: Colors.white),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
