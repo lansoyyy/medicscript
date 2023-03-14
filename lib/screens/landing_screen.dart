@@ -7,6 +7,7 @@ import 'package:mediscript/utils/colors.dart';
 import 'package:mediscript/widgets/text_widget.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
@@ -96,6 +97,43 @@ class _LandingScreenState extends State<LandingScreen> {
   //     }
   //   }
   // }
+
+  final stt.SpeechToText speech = stt.SpeechToText();
+  String _text = '';
+
+  @override
+  void initState() {
+    super.initState();
+    initSpeechState();
+  }
+
+  Future<bool> initSpeechState() async {
+    bool available = await speech.initialize(
+      onStatus: (status) => print('onStatus: $status'),
+      onError: (error) => print('onError: $error'),
+    );
+    return available;
+  }
+
+  void startListening() {
+    if (!speech.isAvailable) {
+      print('Speech recognition not available');
+      return;
+    }
+    if (!speech.isListening) {
+      speech.listen(
+        onResult: (result) => setState(() {
+          _text = result.recognizedWords;
+        }),
+      );
+    }
+  }
+
+  void stopListening() {
+    if (speech.isListening) {
+      speech.stop();
+    }
+  }
 
   void getImage(ImageSource source) async {
     List<String> meds = [];
@@ -273,8 +311,66 @@ class _LandingScreenState extends State<LandingScreen> {
                 GestureDetector(
                   onTap: (() {
                     // getImage(ImageSource.gallery);
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => HistoryScreen()));
+                    // Navigator.of(context).push(MaterialPageRoute(
+                    //     builder: (context) => HistoryScreen()));
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return StatefulBuilder(builder: (context, setState) {
+                            return AlertDialog(
+                              title: TextBold(
+                                  text: 'Result: $_text',
+                                  fontSize: 18,
+                                  color: Colors.black),
+                              content: SizedBox(
+                                height: 150,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                          color: Colors.green),
+                                      child: IconButton(
+                                          onPressed: () {
+                                            startListening();
+                                          },
+                                          icon: const Icon(
+                                            Icons.start_rounded,
+                                            color: Colors.white,
+                                          )),
+                                    ),
+                                    const SizedBox(
+                                      height: 30,
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                          color: Colors.red),
+                                      child: IconButton(
+                                          onPressed: () {
+                                            stopListening();
+                                          },
+                                          icon: const Icon(
+                                            Icons.stop_circle_rounded,
+                                            color: Colors.white,
+                                          )),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                    onPressed: () {},
+                                    child: TextBold(
+                                        text: 'Continue',
+                                        fontSize: 18,
+                                        color: Colors.blue))
+                              ],
+                            );
+                          });
+                        });
                   }),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
