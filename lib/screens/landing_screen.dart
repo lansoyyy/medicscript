@@ -124,6 +124,8 @@ class _LandingScreenState extends State<LandingScreen> {
       speech.listen(
         onResult: (result) => setState(() {
           _text = result.recognizedWords;
+
+          print(_text);
         }),
       );
     }
@@ -325,6 +327,7 @@ class _LandingScreenState extends State<LandingScreen> {
                               content: SizedBox(
                                 height: 150,
                                 child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Container(
                                       decoration: BoxDecoration(
