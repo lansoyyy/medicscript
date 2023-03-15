@@ -125,15 +125,36 @@ class _LandingScreenState extends State<LandingScreen> {
           content: TextRegular(
               text: 'Started Listening. . .',
               fontSize: 12,
-              color: Colors.black)));
+              color: Colors.white)));
       speech.listen(
         onResult: (result) => setState(() {
           _text = result.recognizedWords;
 
+          Navigator.pop(context);
+
+          speech.stop();
+
           showDialog(
               context: context,
               builder: (context) {
-                return const AlertDialog();
+                return AlertDialog(
+                  content: TextRegular(
+                      text: 'Result: ${result.recognizedWords}',
+                      fontSize: 18,
+                      color: Colors.grey),
+                  actions: [
+                    TextButton(
+                      onPressed: (() {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ResultScreen(
+                                  meds: [result.recognizedWords],
+                                )));
+                      }),
+                      child: TextRegular(
+                          text: 'Continue', fontSize: 18, color: Colors.black),
+                    ),
+                  ],
+                );
               });
         }),
       );
