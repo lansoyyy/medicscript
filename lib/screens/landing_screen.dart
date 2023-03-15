@@ -145,6 +145,7 @@ class _LandingScreenState extends State<LandingScreen> {
                   actions: [
                     TextButton(
                       onPressed: (() {
+                        Navigator.pop(context);
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => ResultScreen(
                                   meds: [result.recognizedWords],
