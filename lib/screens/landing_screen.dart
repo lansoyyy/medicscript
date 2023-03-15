@@ -121,11 +121,20 @@ class _LandingScreenState extends State<LandingScreen> {
       return;
     }
     if (!speech.isListening) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: TextRegular(
+              text: 'Started Listening. . .',
+              fontSize: 12,
+              color: Colors.black)));
       speech.listen(
         onResult: (result) => setState(() {
           _text = result.recognizedWords;
 
-          print(_text);
+          showDialog(
+              context: context,
+              builder: (context) {
+                return const AlertDialog();
+              });
         }),
       );
     }
@@ -320,12 +329,12 @@ class _LandingScreenState extends State<LandingScreen> {
                         builder: (context) {
                           return StatefulBuilder(builder: (context, setState) {
                             return AlertDialog(
-                              title: TextBold(
-                                  text: 'Result: $_text',
-                                  fontSize: 18,
-                                  color: Colors.black),
+                              title: TextRegular(
+                                  text: 'Press the button to talk',
+                                  fontSize: 14,
+                                  color: Colors.grey),
                               content: SizedBox(
-                                height: 150,
+                                height: 75,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -343,33 +352,18 @@ class _LandingScreenState extends State<LandingScreen> {
                                             color: Colors.white,
                                           )),
                                     ),
-                                    const SizedBox(
-                                      height: 30,
-                                    ),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(100),
-                                          color: Colors.red),
-                                      child: IconButton(
-                                          onPressed: () {
-                                            stopListening();
-                                          },
-                                          icon: const Icon(
-                                            Icons.stop_circle_rounded,
-                                            color: Colors.white,
-                                          )),
-                                    ),
                                   ],
                                 ),
                               ),
                               actions: [
                                 TextButton(
-                                    onPressed: () {},
-                                    child: TextBold(
-                                        text: 'Continue',
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: TextRegular(
+                                        text: 'Close',
                                         fontSize: 18,
-                                        color: Colors.blue))
+                                        color: Colors.black))
                               ],
                             );
                           });
