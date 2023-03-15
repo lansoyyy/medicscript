@@ -42,12 +42,27 @@ class _ResultScreenState extends State<ResultScreen> {
         title: TextBold(text: 'MediScript', fontSize: 18, color: Colors.white),
         centerTitle: true,
         actions: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 7.5, 20, 7.5),
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset('assets/images/logo.jpg')),
-          )
+          IconButton(
+            onPressed: (() async {
+              if (await canLaunch(
+                  'https://medicalpinas.com/medicine-price-list-in-drug-stores-philippines/')) {
+                await launch(
+                    'https://medicalpinas.com/medicine-price-list-in-drug-stores-philippines/');
+              } else {
+                throw 'Could not launch https://medicalpinas.com/medicine-price-list-in-drug-stores-philippines/';
+              }
+            }),
+            icon: const Icon(
+              Icons.medication_liquid_rounded,
+              color: Colors.white,
+            ),
+          ),
+          // Padding(
+          //   padding: const EdgeInsets.fromLTRB(0, 7.5, 20, 7.5),
+          //   child: ClipRRect(
+          //       borderRadius: BorderRadius.circular(10),
+          //       child: Image.asset('assets/images/logo.jpg')),
+          // )
         ],
       ),
       body: GridView.builder(
