@@ -205,12 +205,13 @@ class _LandingScreenState extends State<LandingScreen> {
         );
 
         final inputImage = InputImage.fromFilePath(croppedFile!.path);
-        String text = await FlutterTesseractOcr.extractText(croppedFile.path,
-            language: 'eng',
-            args: {
-              "psm": "4",
-              "preserve_interword_spaces": "1",
-            });
+        // String text = await FlutterTesseractOcr.extractText(croppedFile.path,
+        //     language: 'eng',
+
+        //     args: {
+        //       "psm": "4",
+        //       "preserve_interword_spaces": "1",
+        //     });
         final textDetector = GoogleMlKit.vision.textDetector();
         RecognisedText recognisedText =
             await textDetector.processImage(inputImage);
@@ -237,7 +238,7 @@ class _LandingScreenState extends State<LandingScreen> {
         //   }
         // }
 
-        print(text);
+        // print(text);
         textScanning = false;
 
         await Future.delayed(const Duration(seconds: 2));
