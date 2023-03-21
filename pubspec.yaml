@@ -44,6 +44,7 @@ dependencies:
   image_cropper:
   localstore:
   speech_to_text:
+  flutter_tesseract_ocr:
 
 
 dev_dependencies:
