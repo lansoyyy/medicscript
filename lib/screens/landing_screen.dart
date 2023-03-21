@@ -8,6 +8,7 @@ import 'package:mediscript/widgets/text_widget.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:flutter_tesseract_ocr/flutter_tesseract_ocr.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
@@ -17,6 +18,8 @@ class LandingScreen extends StatefulWidget {
 }
 
 class _LandingScreenState extends State<LandingScreen> {
+  final textRecognition = FlutterTesseractOcr();
+
   var hasLoaded = false;
 
   bool textScanning = false;
@@ -202,6 +205,12 @@ class _LandingScreenState extends State<LandingScreen> {
         );
 
         final inputImage = InputImage.fromFilePath(croppedFile!.path);
+        String text = await FlutterTesseractOcr.extractText(croppedFile.path,
+            language: 'eng',
+            args: {
+              "psm": "4",
+              "preserve_interword_spaces": "1",
+            });
         final textDetector = GoogleMlKit.vision.textDetector();
         RecognisedText recognisedText =
             await textDetector.processImage(inputImage);
@@ -217,6 +226,9 @@ class _LandingScreenState extends State<LandingScreen> {
             }
           }
         }
+
+        //args support android / Web , i don't have a mac
+
         // for (TextBlock block in recognisedText.blocks) {
         //   for (TextLine line in block.lines) {
         //     setState(() {
@@ -225,7 +237,7 @@ class _LandingScreenState extends State<LandingScreen> {
         //   }
         // }
 
-        print(meds);
+        print(text);
         textScanning = false;
 
         await Future.delayed(const Duration(seconds: 2));
