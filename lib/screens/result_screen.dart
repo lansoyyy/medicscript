@@ -44,12 +44,10 @@ class _ResultScreenState extends State<ResultScreen> {
         actions: [
           IconButton(
             onPressed: (() async {
-              if (await canLaunch(
-                  'https://medicalpinas.com/medicine-price-list-in-drug-stores-philippines/')) {
-                await launch(
-                    'https://medicalpinas.com/medicine-price-list-in-drug-stores-philippines/');
+              if (await canLaunch('https://www.webmd.com/drugs/2/index')) {
+                await launch('https://www.webmd.com/drugs/2/index');
               } else {
-                throw 'Could not launch https://medicalpinas.com/medicine-price-list-in-drug-stores-philippines/';
+                throw 'Could not launch https://www.webmd.com/drugs/2/index';
               }
             }),
             icon: const Icon(
